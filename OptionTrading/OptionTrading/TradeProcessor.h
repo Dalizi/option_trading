@@ -22,10 +22,10 @@ class MessageSharedPtr  {
 public:
 	MessageSharedPtr() = default;
 	MessageSharedPtr(IFuMessage* msg):msg_(msg){
-		std::cout << "Ref count init:" << msg->AddRef() << std::endl;
+		msg->AddRef();
 	}
 	MessageSharedPtr(const MessageSharedPtr& p):msg_(p.msg_) {
-		std::cout << "Ref count copy:" << p.msg_->AddRef() << std::endl;
+		p.msg_->AddRef();
 	}
 	MessageSharedPtr & operator=(const MessageSharedPtr & rhs)
 	{

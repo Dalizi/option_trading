@@ -161,7 +161,7 @@ void TradeProcessor::processQuote(const Quote& quote) {
 	setQuote(quote.contract_code, quote);
 }
 void TradeProcessor::processMsg(const MessageSharedPtr& msg) {
-	auto r_msg = msg.get();
+	/*auto r_msg = msg.get();
 	cout << "Message Type: " << r_msg->GetMsgType() << endl;
 	if (r_msg->GetMsgType() == 203){
 		for (int i = 0; i < r_msg->GetCount(); ++i) {
@@ -171,7 +171,7 @@ void TradeProcessor::processMsg(const MessageSharedPtr& msg) {
 				rec->GetInt("entrust_no"),
 				rec->GetChar("entrust_status"));
 		}
-	}
+	}*/
 }
 
 void TradeProcessor::processOrder(const COrderRspInfo& lpInfo) {
@@ -190,7 +190,7 @@ void TradeProcessor::processOrder(const COrderRspInfo& lpInfo) {
 		lpInfo.entrust_status,
 		lpInfo.curr_time);
 
-	comm_->SubscribeRequest(SingleCode, Snapshot, "m1701-C-2900");
+	/*comm_->SubscribeRequest(SingleCode, Snapshot, "m1701-C-2900");
 	auto quote = popQuote();
 	if (quote.contract_code != "m1701-C-2900") pushQuote(quote);
 	auto msg = NewFuMessage(MSG_TYPE_NEW_SINGLE_ORDER, 0);
@@ -206,13 +206,13 @@ void TradeProcessor::processOrder(const COrderRspInfo& lpInfo) {
 	rec->SetChar("entrust_kind", '0');
 	rec->SetChar("hedge_type", '0');
 	rec->SetDouble("entrust_amount", 1);
-	asyncSendRequest(msg);
+	asyncSendRequest(msg);*/
 }
 
 void TradeProcessor::processTransaction(const CRealRspInfo& lpInfo) {
 	comm_->SubscribeRequest(SingleCode, Snapshot, "m1701-C-2900");
 	auto quote = popQuote();
-	if (quote.contract_code != "m1701-C-2900") pushQuote(quote);
+	if (quote.contract_code != "m1701-C-3000") pushQuote(quote);
 	printf("成交回报——[期货账号]:[%d],[合约代码]:[%s],[成交价格]:[%.3f], [成交数量]:[%.1f], [总成交]:[%d], [委托号]:[%d], [委托批号]:[%d], [主场编号]:[%s], [委托状态]:[%c], [成交编号]:[%s], [成交时间]:[%d]\n",
 		lpInfo.fund_account,
 		lpInfo.contract_code,
@@ -227,17 +227,17 @@ void TradeProcessor::processTransaction(const CRealRspInfo& lpInfo) {
 		lpInfo.business_time);
 	auto msg = NewFuMessage(MSG_TYPE_NEW_SINGLE_ORDER, 0);
 	auto rec = msg->AddRecord();
-
 	rec->SetInt("fund_account", account_);
 	rec->SetString("futu_exch_type", "F2");
 	rec->SetString("contract_code", quote.contract_code.c_str());
-	rec->SetChar("entrust_bs", lpInfo.entrust_bs=="1"?'2':'1');
-	rec->SetDouble("futu_entrust_price", lpInfo.entrust_bs == "1"?quote.ask_price:quote.bid_price);
-	rec->SetChar("futures_direction", lpInfo.entrust_direction=="2"|| lpInfo.entrust_direction == "4"?'1':'2');
+	rec->SetChar("entrust_bs", string(lpInfo.entrust_bs)=="1"?'2':'1');
+	rec->SetDouble("futu_entrust_price", string(lpInfo.entrust_bs) == "2"?(lpInfo.business_price-0.5):(lpInfo.business_price+0.5));
+	rec->SetChar("futures_direction", string(lpInfo.entrust_direction)=="2"|| string(lpInfo.entrust_direction) == "4"?'1':'2');
 	rec->SetChar("futu_entrust_prop", '0');
 	rec->SetChar("entrust_kind", '0');
 	rec->SetChar("hedge_type", '0');
 	rec->SetDouble("entrust_amount", lpInfo.business_amount);
+	cout <<"买卖方向："<< rec->GetChar("entrust_bs") << "开平方向：" << rec->GetChar("futures_direction") <<endl;
 	asyncSendRequest(msg);
 }
 
@@ -257,13 +257,13 @@ void TradeProcessor::test() {
 	rec->SetInt("fund_account", account_);
 	rec->SetString("futu_exch_type", "F2");
 	rec->SetString("contract_code", "m1701-C-2900");
-	rec->SetChar("entrust_bs", '1');
-	rec->SetDouble("futu_entrust_price", quote.ask_price);
+	rec->SetChar("entrust_bs", '2');
+	rec->SetDouble("futu_entrust_price", 435);
 	rec->SetChar("futures_direction", '1');
 	rec->SetChar("futu_entrust_prop", '0');
 	rec->SetChar("entrust_kind", '0');
 	rec->SetChar("hedge_type", '0');
-	rec->SetDouble("entrust_amount", 1);
+	rec->SetDouble("entrust_amount", 10);
 	asyncSendRequest(msg);
 	
 	msg = NewFuMessage(MSG_TYPE_GET_ENTRUST_ORDERS, 0);

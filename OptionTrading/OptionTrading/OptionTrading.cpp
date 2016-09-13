@@ -5,12 +5,18 @@
 #include "TradeProcessor.h"
 #include <iostream>
 #include <Windows.h>
+#include <fstream>
 
 using namespace std;
 int main()
 {
 	TradeProcessor::setupCommunication();
-	TradeProcessor::createProcessor(18901685, "999999");
+	fstream f("Account.txt");
+	string line;
+	while (getline(f, line)) {
+		if(!line.empty())
+			TradeProcessor::createProcessor(stoi(line), "999999");
+	}
 	char c;
 	//auto msg = NewFuMessage(MSG_TYPE_NEW_SINGLE_ORDER, 0);
 	//auto rec = msg->AddRecord();
@@ -31,6 +37,10 @@ int main()
 	//	msg->Release();
 	//}
 	while (cin >> c) TradeProcessor::testAll();
+
+	//cout << "Price is: " << Pricing::delta_call(1, 1, 0.02, 0.25, 0.1) << endl;
+	//cout << "Root is: " <<Pricing::implied_vol_call(0.5, 0.03, 1,1,0.02, 0.25) << endl;
+	//system("Pause");
 	return 0;
 }
 

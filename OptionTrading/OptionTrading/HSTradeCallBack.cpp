@@ -54,12 +54,11 @@ using namespace std;
 
 	void HSAPI HSCallBack::OnRspSubResult(IHsFutuComm* lpComm,REGType sType,REGAction aType,int iResult,const char* lpParam,const char* szMessage)
 	{
-		cout << "OnRspSubResult" << endl;
-	}
+			}
 
 	void HSAPI HSCallBack::OnReceivedBiz(IHsFutuComm* lpComm,IFuMessage* lpAnsMsg,int iRet,int iKeyID)
 	{
-		cout << "收到业务应答数据： " << iRet << endl;
+		//cout << "收到业务应答数据： " << iRet << endl;
 		TradeProcessor::notifyProcess(iKeyID, MessageSharedPtr(lpAnsMsg));
 	}
 
